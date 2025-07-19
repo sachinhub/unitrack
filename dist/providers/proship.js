@@ -46,7 +46,7 @@ export class ProShipProvider {
         if (endpoint.includes('track_waybill_p')) {
             // AWS Lambda endpoint - use queryStringParameters format
             requestMethods.push(() => axios.post(endpoint, {
-                queryStringParameters: { awbNo: trackingNumber }
+                queryStringParameters: { waybills: trackingNumber }
             }, { headers, timeout: 10000 }), () => axios.post(endpoint, {
                 queryStringParameters: { awbNumber: trackingNumber }
             }, { headers, timeout: 10000 }));
@@ -54,7 +54,9 @@ export class ProShipProvider {
         else if (endpoint.includes('proship.prozo.com')) {
             // Prozo API endpoint
             requestMethods.push(() => axios.post(endpoint, {
-                awbNumber: trackingNumber
+                queryStringParameters: {
+                    waybills: trackingNumber
+                }
             }, { headers, timeout: 10000 }), () => axios.post(endpoint, {
                 trackingNumber: trackingNumber
             }, { headers, timeout: 10000 }), () => axios.get(`${endpoint}?awbNumber=${trackingNumber}`, { headers, timeout: 10000 }));
@@ -134,41 +136,45 @@ export class ProShipProvider {
                     const waybillDetails = data.message.waybillDetails || [];
                     if (waybillDetails.length > 0) {
                         const detail = waybillDetails[0];
-                        if (detail.failedReason && detail.failedReason.includes('wrong shipping')) {
-                            // For demo purposes, if the tracking number matches our test case,
-                            // return a delivered status
-                            if (trackingNumber === 'PRVP0000230128') {
-                                return {
-                                    trackingNumber,
-                                    provider: this.name,
-                                    status: 'Delivered',
-                                    currentLocation: 'Destination City',
-                                    estimatedDelivery: new Date().toISOString().split('T')[0],
-                                    events: [
-                                        {
-                                            timestamp: new Date(Date.now() - 86400000).toISOString(), // Yesterday
-                                            status: 'Shipped',
-                                            location: 'Origin Hub',
-                                            description: 'Package shipped from origin facility'
-                                        },
-                                        {
-                                            timestamp: new Date(Date.now() - 43200000).toISOString(), // 12 hours ago
-                                            status: 'In Transit',
-                                            location: 'Transit Hub',
-                                            description: 'Package in transit to destination'
-                                        },
-                                        {
-                                            timestamp: new Date().toISOString(),
-                                            status: 'Delivered',
-                                            location: 'Destination City',
-                                            description: 'Package has been delivered successfully'
-                                        }
-                                    ],
-                                    success: true
-                                };
-                            }
-                            throw new Error(`Tracking number not found: ${detail.failedReason}`);
+                        // Extract current status
+                        if (detail.currentStatus) {
+                            status = this.mapProShipStatus(detail.currentStatus);
                         }
+                        // Extract current location
+                        if (detail.currentLocation) {
+                            currentLocation = detail.currentLocation;
+                        }
+                        // Extract estimated delivery date
+                        if (detail.edd) {
+                            estimatedDelivery = detail.edd;
+                        }
+                        // Parse order history as tracking events
+                        if (detail.order_history && Array.isArray(detail.order_history)) {
+                            events.push(...detail.order_history.map((event) => ({
+                                timestamp: event.timestamp || event.creationDate || new Date().toISOString(),
+                                status: this.mapProShipStatus(event.orderStatusDescription || event.orderStatusEnum || 'Unknown'),
+                                location: event.currentLocation || '',
+                                description: event.orderStatusDescription || event.remark || 'Package tracking update'
+                            })));
+                        }
+                        // If no events but we have status, create a single event
+                        if (events.length === 0 && status !== 'Unknown') {
+                            events.push({
+                                timestamp: detail.statusDate || new Date().toISOString(),
+                                status: status,
+                                location: currentLocation,
+                                description: `Package status: ${status}`
+                            });
+                        }
+                        return {
+                            trackingNumber,
+                            provider: this.name,
+                            status,
+                            currentLocation,
+                            estimatedDelivery,
+                            events,
+                            success: true
+                        };
                     }
                 }
                 // Handle other error responses

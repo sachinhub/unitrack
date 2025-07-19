@@ -1,12 +1,14 @@
 import { TrackingProvider, TrackingResult } from './types.js';
 import { ProShipProvider } from './providers/proship.js';
+import { ShipwayProvider } from './providers/shipway.js';
 
 export class UniversalTracker {
   private providers: TrackingProvider[] = [];
 
   constructor() {
     this.providers = [
-      new ProShipProvider()
+      new ProShipProvider(),
+      new ShipwayProvider()
     ];
   }
 

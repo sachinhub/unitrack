@@ -1,9 +1,11 @@
 import { ProShipProvider } from './providers/proship.js';
+import { ShipwayProvider } from './providers/shipway.js';
 export class UniversalTracker {
     providers = [];
     constructor() {
         this.providers = [
-            new ProShipProvider()
+            new ProShipProvider(),
+            new ShipwayProvider()
         ];
     }
     identifyProvider(trackingNumber) {

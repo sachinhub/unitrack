@@ -7,14 +7,18 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "tsx src/index.ts"
+    "server": "node server.js",
+    "dev": "tsx src/index.ts",
+    "postinstall": "npm run build"
   },
   "keywords": ["mcp", "tracking", "shipment", "proship"],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "axios": "^1.6.0"
+    "axios": "^1.6.0",
+    "express": "^4.18.0",
+    "ws": "^8.14.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
