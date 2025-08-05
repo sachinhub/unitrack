@@ -1,0 +1,118 @@
+openapi: 3.0.3
+info:
+  title: Track Shipment API
+  description: Track a shipment using its tracking number
+  version: 1.0.0
+
+servers:
+  - url: https://unitrack-mcp-server.onrender.com
+    description: Production server
+
+paths:
+  /api/track:
+    post:
+      summary: Track a shipment
+      description: Track a shipment using its tracking number. Automatically detects the shipping provider and returns detailed tracking information.
+      operationId: trackShipment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tracking_number
+              properties:
+                tracking_number:
+                  type: string
+                  description: The tracking number to track (e.g., PRVP0000230127 for ProShip)
+                  example: "PRVP0000230127"
+      responses:
+        '200':
+          description: Tracking information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tracking_number:
+                    type: string
+                    description: The tracking number that was queried
+                    example: "PRVP0000230127"
+                  provider:
+                    type: string
+                    description: The shipping provider that handled the shipment
+                    example: "ProShip"
+                  status:
+                    type: string
+                    description: Current status of the shipment
+                    example: "Delivered"
+                  current_location:
+                    type: string
+                    description: Current location of the shipment
+                    example: "BhadravathiHub_BVT Bhadravathi"
+                  estimated_delivery:
+                    type: string
+                    description: Estimated delivery date
+                    example: "2025-07-18"
+                  events:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: ISO 8601 timestamp of the event
+                          example: "2025-07-16T10:00:00.000Z"
+                        status:
+                          type: string
+                          description: Status of the tracking event
+                          example: "Delivered"
+                        location:
+                          type: string
+                          description: Location where the event occurred
+                          example: "BhadravathiHub_BVT Bhadravathi"
+                        description:
+                          type: string
+                          description: Detailed description of the event
+                          example: "Shipment Delivered"
+                    description: Array of tracking events in chronological order
+                  success:
+                    type: boolean
+                    description: Whether the tracking request was successful
+                    example: true
+                  error:
+                    type: string
+                    description: Error message if the tracking failed
+                    example: "Tracking number not found"
+        '400':
+          description: Bad request - missing or invalid tracking number
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Tracking number is required"
+                  success:
+                    type: boolean
+                    description: Always false for error responses
+                    example: false
+        '500':
+          description: Server error or tracking provider error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Unable to retrieve tracking information"
+                  success:
+                    type: boolean
+                    description: Always false for error responses
+                    example: false 

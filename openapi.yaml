@@ -1,0 +1,568 @@
+openapi: 3.0.3
+info:
+  title: UniTrack MCP Server API
+  description: Universal tracking MCP server for shipment tracking across multiple providers
+  version: 1.0.0
+  contact:
+    name: UniTrack MCP Server
+    url: https://github.com/sachinhub/unitrack
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://unitrack-mcp-server.onrender.com
+    description: Production server
+  - url: http://localhost:3000
+    description: Local development server
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Check if the UniTrack MCP Server is running and healthy
+      operationId: getHealth
+      tags:
+        - System
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+                  message:
+                    type: string
+                    example: "UniTrack MCP Server is running"
+        '500':
+          description: Server is not healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "error"
+                  message:
+                    type: string
+                    example: "Server is not responding"
+
+  /api/providers:
+    get:
+      summary: Get supported shipping providers
+      description: Retrieve a list of all supported shipping providers
+      operationId: getProviders
+      tags:
+        - Providers
+      responses:
+        '200':
+          description: List of supported providers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  supported_providers:
+                    type: array
+                    items:
+                      type: string
+                    example: ["ProShip", "Shipway"]
+                  total_count:
+                    type: integer
+                    example: 2
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/track:
+    post:
+      summary: Track a shipment
+      description: Track a shipment using its tracking number. Automatically detects the shipping provider and returns detailed tracking information.
+      operationId: trackShipment
+      tags:
+        - Tracking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tracking_number
+              properties:
+                tracking_number:
+                  type: string
+                  description: The tracking number to track (e.g., PRVP0000230127 for ProShip)
+                  example: "PRVP0000230127"
+      responses:
+        '200':
+          description: Tracking information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackingResult'
+        '400':
+          description: Bad request - missing or invalid tracking number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error or tracking provider error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/mcp/tools/list:
+    post:
+      summary: MCP tools list endpoint
+      description: Get list of available MCP tools for Model Context Protocol
+      operationId: getMCPToolsList
+      tags:
+        - MCP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                id:
+                  type: integer
+                  example: 1
+                method:
+                  type: string
+                  example: "tools/list"
+      responses:
+        '200':
+          description: List of available MCP tools
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: object
+                    properties:
+                      tools:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MCPTool'
+
+  /api/mcp/tools/call:
+    post:
+      summary: MCP tools call endpoint
+      description: Execute an MCP tool call for Model Context Protocol
+      operationId: callMCPTool
+      tags:
+        - MCP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jsonrpc
+                - id
+                - method
+                - params
+              properties:
+                jsonrpc:
+                  type: string
+                  example: "2.0"
+                id:
+                  type: integer
+                  example: 1
+                method:
+                  type: string
+                  example: "tools/call"
+                params:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: "track_shipment"
+                    arguments:
+                      type: object
+                      properties:
+                        tracking_number:
+                          type: string
+                          example: "PRVP0000230127"
+      responses:
+        '200':
+          description: MCP tool execution result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jsonrpc:
+                    type: string
+                    example: "2.0"
+                  id:
+                    type: integer
+                    example: 1
+                  result:
+                    type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              example: "text"
+                            text:
+                              type: string
+                              description: JSON string of the tracking result
+
+  /policy:
+    get:
+      summary: Privacy policy and terms of service
+      description: Get comprehensive privacy policy and terms of service for the API
+      operationId: getPrivacyPolicy
+      tags:
+        - Legal
+      responses:
+        '200':
+          description: Privacy policy and terms of service
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  privacy_policy:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        example: "UniTrack MCP Server - Privacy Policy & Terms of Service"
+                      last_updated:
+                        type: string
+                        example: "2025-08-05"
+                      version:
+                        type: string
+                        example: "1.0.0"
+                      overview:
+                        type: object
+                        properties:
+                          description:
+                            type: string
+                          service:
+                            type: string
+                      information_collection:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          data_collected:
+                            type: array
+                            items:
+                              type: string
+                          data_not_collected:
+                            type: array
+                            items:
+                              type: string
+                      data_usage:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          purposes:
+                            type: array
+                            items:
+                              type: string
+                      data_sharing:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          sharing_scenarios:
+                            type: array
+                            items:
+                              type: string
+                          no_selling:
+                            type: string
+                      data_retention:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          retention_periods:
+                            type: object
+                      security:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          measures:
+                            type: array
+                            items:
+                              type: string
+                      api_usage:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          terms:
+                            type: array
+                            items:
+                              type: string
+                          rate_limits:
+                            type: object
+                      user_rights:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          rights:
+                            type: array
+                            items:
+                              type: string
+                      cookies:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          usage:
+                            type: array
+                            items:
+                              type: string
+                      children:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                      international:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                      changes:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                      contact:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          contact_methods:
+                            type: array
+                            items:
+                              type: string
+                      legal:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          jurisdiction:
+                            type: string
+
+  /:
+    get:
+      summary: API documentation
+      description: Get API documentation and available endpoints
+      operationId: getAPIDocumentation
+      tags:
+        - Documentation
+      responses:
+        '200':
+          description: API documentation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: "UniTrack MCP Server"
+                  version:
+                    type: string
+                    example: "1.0.0"
+                  description:
+                    type: string
+                  endpoints:
+                    type: object
+                    additionalProperties:
+                      type: string
+                  example:
+                    type: object
+                    properties:
+                      track_shipment:
+                        type: object
+                        properties:
+                          method:
+                            type: string
+                          url:
+                            type: string
+                          body:
+                            type: object
+
+components:
+  schemas:
+    TrackingEvent:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of the event
+          example: "2025-07-16T10:00:00.000Z"
+        status:
+          type: string
+          description: Status of the tracking event
+          example: "Delivered"
+        location:
+          type: string
+          description: Location where the event occurred
+          example: "BhadravathiHub_BVT Bhadravathi"
+        description:
+          type: string
+          description: Detailed description of the event
+          example: "Shipment Delivered"
+
+    TrackingResult:
+      type: object
+      properties:
+        tracking_number:
+          type: string
+          description: The tracking number that was queried
+          example: "PRVP0000230127"
+        provider:
+          type: string
+          description: The shipping provider that handled the shipment
+          example: "ProShip"
+        status:
+          type: string
+          description: Current status of the shipment
+          example: "Delivered"
+        current_location:
+          type: string
+          description: Current location of the shipment
+          example: "BhadravathiHub_BVT Bhadravathi"
+        estimated_delivery:
+          type: string
+          description: Estimated delivery date
+          example: "2025-07-18"
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackingEvent'
+          description: Array of tracking events in chronological order
+        success:
+          type: boolean
+          description: Whether the tracking request was successful
+          example: true
+        error:
+          type: string
+          description: Error message if the tracking failed
+          example: "Tracking number not found"
+
+    MCPTool:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the MCP tool
+          example: "track_shipment"
+        description:
+          type: string
+          description: Description of what the tool does
+          example: "Track a shipment using its tracking number. Automatically detects the shipping provider and returns detailed tracking information."
+        inputSchema:
+          type: object
+          properties:
+            type:
+              type: string
+              example: "object"
+            properties:
+              type: object
+              properties:
+                tracking_number:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      example: "string"
+                    description:
+                      type: string
+                      example: "The tracking number to track (e.g., PRVP0000230128 for ProShip)"
+            required:
+              type: array
+              items:
+                type: string
+              example: ["tracking_number"]
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Tracking number is required"
+        success:
+          type: boolean
+          description: Always false for error responses
+          example: false
+
+tags:
+  - name: System
+    description: System health and status endpoints
+  - name: Providers
+    description: Shipping provider information
+  - name: Tracking
+    description: Shipment tracking endpoints
+  - name: MCP
+    description: Model Context Protocol endpoints
+  - name: Legal
+    description: Privacy policy and legal information
+  - name: Documentation
+    description: API documentation endpoints 

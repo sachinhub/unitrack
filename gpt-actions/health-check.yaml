@@ -1,0 +1,47 @@
+openapi: 3.0.3
+info:
+  title: Health Check API
+  description: Check if the UniTrack MCP Server is running and healthy
+  version: 1.0.0
+
+servers:
+  - url: https://unitrack-mcp-server.onrender.com
+    description: Production server
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Check if the UniTrack MCP Server is running and healthy
+      operationId: getHealth
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Health status of the server
+                    example: "ok"
+                  message:
+                    type: string
+                    description: Status message
+                    example: "UniTrack MCP Server is running"
+        '500':
+          description: Server is not healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Error status
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Server is not responding" 

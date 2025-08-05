@@ -1,0 +1,183 @@
+openapi: 3.0.3
+info:
+  title: Privacy Policy API
+  description: Get comprehensive privacy policy and terms of service for the API
+  version: 1.0.0
+
+servers:
+  - url: https://unitrack-mcp-server.onrender.com
+    description: Production server
+
+paths:
+  /policy:
+    get:
+      summary: Privacy policy and terms of service
+      description: Get comprehensive privacy policy and terms of service for the API
+      operationId: getPrivacyPolicy
+      responses:
+        '200':
+          description: Privacy policy and terms of service
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  privacy_policy:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                        description: Title of the privacy policy
+                        example: "UniTrack MCP Server - Privacy Policy & Terms of Service"
+                      last_updated:
+                        type: string
+                        description: Last update date
+                        example: "2025-08-05"
+                      version:
+                        type: string
+                        description: Policy version
+                        example: "1.0.0"
+                      overview:
+                        type: object
+                        properties:
+                          description:
+                            type: string
+                            description: Overview description
+                          service:
+                            type: string
+                            description: Service description
+                      information_collection:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          data_collected:
+                            type: array
+                            items:
+                              type: string
+                          data_not_collected:
+                            type: array
+                            items:
+                              type: string
+                      data_usage:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          purposes:
+                            type: array
+                            items:
+                              type: string
+                      data_sharing:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          sharing_scenarios:
+                            type: array
+                            items:
+                              type: string
+                          no_selling:
+                            type: string
+                      data_retention:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          retention_periods:
+                            type: object
+                      security:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          measures:
+                            type: array
+                            items:
+                              type: string
+                      api_usage:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          terms:
+                            type: array
+                            items:
+                              type: string
+                          rate_limits:
+                            type: object
+                      user_rights:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          rights:
+                            type: array
+                            items:
+                              type: string
+                      cookies:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          usage:
+                            type: array
+                            items:
+                              type: string
+                      children:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                      international:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                      changes:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                      contact:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          contact_methods:
+                            type: array
+                            items:
+                              type: string
+                      legal:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                          description:
+                            type: string
+                          jurisdiction:
+                            type: string 

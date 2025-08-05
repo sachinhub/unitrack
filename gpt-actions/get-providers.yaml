@@ -1,0 +1,49 @@
+openapi: 3.0.3
+info:
+  title: Get Providers API
+  description: Get list of supported shipping providers
+  version: 1.0.0
+
+servers:
+  - url: https://unitrack-mcp-server.onrender.com
+    description: Production server
+
+paths:
+  /api/providers:
+    get:
+      summary: Get supported shipping providers
+      description: Retrieve a list of all supported shipping providers
+      operationId: getProviders
+      responses:
+        '200':
+          description: List of supported providers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  supported_providers:
+                    type: array
+                    items:
+                      type: string
+                    description: Array of supported shipping provider names
+                    example: ["ProShip", "Shipway"]
+                  total_count:
+                    type: integer
+                    description: Total number of supported providers
+                    example: 2
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+                    example: "Failed to retrieve providers"
+                  success:
+                    type: boolean
+                    description: Always false for error responses
+                    example: false 
