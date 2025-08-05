@@ -202,13 +202,159 @@ app.get('/', (req, res) => {
       'GET /api/providers': 'Get supported shipping providers',
       'POST /api/track': 'Track a shipment (send tracking_number in body)',
       'POST /api/mcp/tools/list': 'MCP tools/list endpoint',
-      'POST /api/mcp/tools/call': 'MCP tools/call endpoint'
+      'POST /api/mcp/tools/call': 'MCP tools/call endpoint',
+      'GET /policy': 'Privacy policy and terms of service'
     },
     example: {
       track_shipment: {
         method: 'POST',
         url: '/api/track',
         body: { tracking_number: 'PRVP0000230127' }
+      }
+    }
+  });
+});
+
+// Privacy Policy endpoint
+app.get('/policy', (req, res) => {
+  res.json({
+    privacy_policy: {
+      title: 'UniTrack MCP Server - Privacy Policy & Terms of Service',
+      last_updated: '2025-08-05',
+      version: '1.0.0',
+      
+      overview: {
+        description: 'This privacy policy explains how UniTrack MCP Server collects, uses, and protects your information when you use our shipment tracking API.',
+        service: 'UniTrack MCP Server is a universal tracking service that provides shipment tracking across multiple providers including ProShip, Shipway, and others.'
+      },
+      
+      information_collection: {
+        title: 'Information We Collect',
+        description: 'We collect minimal information necessary to provide our tracking services:',
+        data_collected: [
+          'Tracking numbers you submit for tracking',
+          'IP addresses for security and abuse prevention',
+          'Usage analytics (request frequency, response times)',
+          'Error logs for service improvement'
+        ],
+        data_not_collected: [
+          'Personal identification information',
+          'Payment information',
+          'Address details',
+          'Phone numbers or email addresses'
+        ]
+      },
+      
+      data_usage: {
+        title: 'How We Use Your Information',
+        description: 'Your information is used solely for:',
+        purposes: [
+          'Providing shipment tracking services',
+          'Improving API performance and reliability',
+          'Preventing abuse and security threats',
+          'Technical support and debugging'
+        ]
+      },
+      
+      data_sharing: {
+        title: 'Data Sharing and Third Parties',
+        description: 'We may share data in the following circumstances:',
+        sharing_scenarios: [
+          'With shipping providers (ProShip, Shipway) to retrieve tracking information',
+          'With hosting providers (Render) for service delivery',
+          'When required by law or legal process',
+          'To protect our rights and prevent abuse'
+        ],
+        no_selling: 'We do not sell, rent, or trade your personal information to third parties.'
+      },
+      
+      data_retention: {
+        title: 'Data Retention',
+        description: 'We retain data for the following periods:',
+        retention_periods: {
+          'Tracking requests': '30 days',
+          'Error logs': '90 days',
+          'Usage analytics': '1 year',
+          'IP addresses': '7 days'
+        }
+      },
+      
+      security: {
+        title: 'Data Security',
+        description: 'We implement appropriate security measures:',
+        measures: [
+          'HTTPS encryption for all API communications',
+          'Secure hosting infrastructure',
+          'Regular security updates',
+          'Access controls and monitoring'
+        ]
+      },
+      
+      api_usage: {
+        title: 'API Usage Terms',
+        description: 'By using our API, you agree to:',
+        terms: [
+          'Use the API for legitimate tracking purposes only',
+          'Respect rate limits and fair use policies',
+          'Not attempt to reverse engineer or abuse the service',
+          'Comply with applicable laws and regulations'
+        ],
+        rate_limits: {
+          'Free tier': '1000 requests per hour',
+          'Commercial use': 'Contact for custom limits'
+        }
+      },
+      
+      user_rights: {
+        title: 'Your Rights',
+        description: 'You have the right to:',
+        rights: [
+          'Request information about data we hold about you',
+          'Request deletion of your data',
+          'Opt out of analytics collection',
+          'Report security concerns'
+        ]
+      },
+      
+      cookies: {
+        title: 'Cookies and Tracking',
+        description: 'We use minimal cookies and tracking:',
+        usage: [
+          'Session cookies for web interface functionality',
+          'Analytics cookies for service improvement',
+          'No third-party advertising cookies'
+        ]
+      },
+      
+      children: {
+        title: 'Children\'s Privacy',
+        description: 'Our service is not intended for children under 13. We do not knowingly collect personal information from children under 13.'
+      },
+      
+      international: {
+        title: 'International Data Transfers',
+        description: 'Your data may be processed in countries other than your own. We ensure appropriate safeguards are in place for international transfers.'
+      },
+      
+      changes: {
+        title: 'Changes to This Policy',
+        description: 'We may update this privacy policy from time to time. We will notify users of significant changes via API documentation updates.'
+      },
+      
+      contact: {
+        title: 'Contact Information',
+        description: 'For privacy-related questions or concerns:',
+        contact_methods: [
+          'Email: privacy@unitrack-mcp.com',
+          'GitHub Issues: https://github.com/sachinhub/unitrack/issues',
+          'API Documentation: /'
+        ]
+      },
+      
+      legal: {
+        title: 'Legal Information',
+        description: 'This service is provided "as is" without warranties. We are not responsible for tracking information accuracy provided by third-party providers.',
+        jurisdiction: 'This policy is governed by applicable data protection laws.'
       }
     }
   });
