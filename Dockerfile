@@ -2,17 +2,14 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first
 COPY package*.json ./
-
-# Install dependencies
-RUN npm install
 
 # Copy source code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Install dependencies and build
+RUN npm install && npm run build
 
 # Expose port
 EXPOSE 3000

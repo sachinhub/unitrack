@@ -11,8 +11,7 @@
     "build": "tsc",
     "start": "node server.js",
     "mcp": "node dist/index.js",
-    "dev": "tsx src/index.ts",
-    "postinstall": "npm run build"
+    "dev": "tsx src/index.ts"
   },
   "keywords": ["mcp", "tracking", "shipment", "proship"],
   "author": "",
