@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: UniTrack MCP Server API
   description: Universal tracking MCP server for shipment tracking across multiple providers
@@ -11,10 +11,8 @@ info:
     url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: https://unitrack-mcp-server.onrender.com
+  - url: https://unitrack-1-gmk0.onrender.com
     description: Production server
-  - url: http://localhost:3000
-    description: Local development server
 
 paths:
   /health:

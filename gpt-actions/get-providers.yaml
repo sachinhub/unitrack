@@ -1,11 +1,11 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: Get Providers API
   description: Get list of supported shipping providers
   version: 1.0.0
 
 servers:
-  - url: https://unitrack-mcp-server.onrender.com
+  - url: https://unitrack-1-gmk0.onrender.com
     description: Production server
 
 paths:

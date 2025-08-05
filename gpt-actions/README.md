@@ -40,12 +40,12 @@ Use individual schemas for specific functionality:
 
 ```yaml
 # For tracking shipments only
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: Track Shipment
   description: Track shipments with tracking numbers
 servers:
-  - url: https://unitrack-mcp-server.onrender.com
+  - url: https://unitrack-1-gmk0.onrender.com
 paths:
   /api/track:
     post:
@@ -58,12 +58,12 @@ Use the main `openapi.yaml` for full API access:
 
 ```yaml
 # For complete API access
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: UniTrack MCP Server API
   description: Universal tracking MCP server
 servers:
-  - url: https://unitrack-mcp-server.onrender.com
+  - url: https://unitrack-1-gmk0.onrender.com
 paths:
   # ... (all endpoints)
 ```
@@ -88,7 +88,7 @@ Select the appropriate schema based on your needs:
 
 ```javascript
 // Example GPT action call
-const response = await fetch('https://unitrack-mcp-server.onrender.com/api/track', {
+const response = await fetch('https://unitrack-1-gmk0.onrender.com/api/track', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -184,9 +184,9 @@ The API includes rate limiting:
 ## 🌐 Production URLs
 
 ### **Render Deployment**
-- **Production**: `https://unitrack-mcp-server.onrender.com`
-- **Health Check**: `https://unitrack-mcp-server.onrender.com/health`
-- **API Docs**: `https://unitrack-mcp-server.onrender.com/`
+- **Production**: `https://unitrack-1-gmk0.onrender.com`
+- **Health Check**: `https://unitrack-1-gmk0.onrender.com/health`
+- **API Docs**: `https://unitrack-1-gmk0.onrender.com/`
 
 ### **Local Development**
 - **Local**: `http://localhost:3000`
@@ -195,8 +195,8 @@ The API includes rate limiting:
 ## 📞 Support
 
 - **GitHub Issues**: https://github.com/sachinhub/unitrack/issues
-- **API Documentation**: `https://unitrack-mcp-server.onrender.com/`
-- **Privacy Policy**: `https://unitrack-mcp-server.onrender.com/policy`
+- **API Documentation**: `https://unitrack-1-gmk0.onrender.com/`
+- **Privacy Policy**: `https://unitrack-1-gmk0.onrender.com/policy`
 
 ## 🎉 Ready to Use!
 
