@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "server": "node server.js",
+    "start": "node server.js",
+    "mcp": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "postinstall": "npm run build"
   },

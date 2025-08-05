@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniTrack MCP Server</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .status {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .status.delivered { color: #28a745; }
+        .status.intransit { color: #ffc107; }
+        .status.pending { color: #6c757d; }
+        .status.error { color: #dc3545; }
+        .event {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 3px;
+            border-left: 3px solid #007bff;
+        }
+        .event-time {
+            font-size: 12px;
+            color: #666;
+        }
+        .event-location {
+            font-weight: 600;
+            color: #333;
+        }
+        .event-description {
+            color: #555;
+            margin-top: 5px;
+        }
+        .api-info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+        .api-info h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .endpoint {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚚 UniTrack MCP Server</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            Universal tracking server for shipment tracking across multiple providers
+        </p>
+
+        <div class="form-group">
+            <label for="trackingNumber">Tracking Number:</label>
+            <input type="text" id="trackingNumber" placeholder="Enter tracking number (e.g., PRVP0000230127)" value="PRVP0000230127">
+        </div>
+
+        <button onclick="trackShipment()">Track Shipment</button>
+
+        <div id="result"></div>
+
+        <div class="api-info">
+            <h3>API Endpoints</h3>
+            <div class="endpoint">
+                <strong>GET /health</strong> - Health check
+            </div>
+            <div class="endpoint">
+                <strong>GET /api/providers</strong> - Get supported providers
+            </div>
+            <div class="endpoint">
+                <strong>POST /api/track</strong> - Track a shipment
+            </div>
+            <div class="endpoint">
+                <strong>POST /api/mcp/tools/list</strong> - MCP tools list
+            </div>
+            <div class="endpoint">
+                <strong>POST /api/mcp/tools/call</strong> - MCP tools call
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function trackShipment() {
+            const trackingNumber = document.getElementById('trackingNumber').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (!trackingNumber) {
+                resultDiv.innerHTML = '<div class="result error"><div class="status error">Error</div>Please enter a tracking number.</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="result"><div class="status">Tracking...</div>Please wait while we fetch the tracking information.</div>';
+
+            try {
+                const response = await fetch('/api/track', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ tracking_number: trackingNumber })
+                });
+
+                const data = await response.json();
+
+                if (data.success === false) {
+                    resultDiv.innerHTML = `<div class="result error"><div class="status error">Error</div>${data.error}</div>`;
+                    return;
+                }
+
+                let statusClass = 'pending';
+                if (data.status.toLowerCase().includes('delivered')) statusClass = 'delivered';
+                else if (data.status.toLowerCase().includes('transit')) statusClass = 'intransit';
+                else if (data.status.toLowerCase().includes('error')) statusClass = 'error';
+
+                let eventsHtml = '';
+                if (data.events && data.events.length > 0) {
+                    eventsHtml = '<h4>Tracking History:</h4>';
+                    data.events.forEach(event => {
+                        const date = new Date(event.timestamp).toLocaleString();
+                        eventsHtml += `
+                            <div class="event">
+                                <div class="event-time">${date}</div>
+                                <div class="event-location">${event.location || 'Unknown location'}</div>
+                                <div class="event-description">${event.description}</div>
+                            </div>
+                        `;
+                    });
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="result">
+                        <div class="status ${statusClass}">${data.status}</div>
+                        <p><strong>Provider:</strong> ${data.provider}</p>
+                        <p><strong>Current Location:</strong> ${data.current_location}</p>
+                        <p><strong>Estimated Delivery:</strong> ${data.estimated_delivery}</p>
+                        ${eventsHtml}
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error"><div class="status error">Error</div>Failed to track shipment: ${error.message}</div>`;
+            }
+        }
+
+        // Allow Enter key to trigger tracking
+        document.getElementById('trackingNumber').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                trackShipment();
+            }
+        });
+    </script>
+</body>
+</html> 
